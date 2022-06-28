@@ -1,0 +1,11 @@
+---
+- name: install ruby
+  ansible.builtin.import_tasks: ruby.yml
+- name: redmine database setting
+  ansible.builtin.import_tasks: database.yml
+- name: setup redmine
+  ansible.builtin.import_tasks: redmine.yml
+- name: upload custom script
+  ansible.builtin.import_tasks: custom_script.yml
+- name: setup cron jobs
+  ansible.builtin.import_tasks: cron.yml

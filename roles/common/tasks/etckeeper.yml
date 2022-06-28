@@ -1,0 +1,16 @@
+---
+- name: install etckeeper
+  ansible.builtin.apt:
+    name: etckeeper
+- name: check git repository directory
+  ansible.builtin.stat:
+    path: /etc/.git
+  register: result
+- name: initilize etckeeper
+  ansible.builtin.command: etckeeper init
+  args:
+    chdir: /etc
+  when: not result.stat.exists
+- name: initial commit
+  ansible.builtin.command: etckeeper commit "Initial commit"
+  when: not result.stat.exists

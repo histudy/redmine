@@ -1,0 +1,29 @@
+- name: Deploy Redmine
+  hosts: redmine
+  pre_tasks:
+    - name: オブジェクトストレージからバックアップファイルファイルを取得し所定のパスに保存
+      ansible.builtin.command: 
+        cmd: "(取得するコマンドをここに書く)"
+        creates: "{{ redmine_home }}/config/initializers/secret_token.rb"
+      loop:
+        - src: "(オブジェクトストレージのfilesのバックデータのパスをここに書く)"
+          dest: "{{ redmine_restore_files_archive_file }}"
+        - src: "(オブジェクトストレージのデータベースダンプデータのパスをここに書く)"
+          dest: "{{ redmine_restore_database_dump_file }}"
+        
+  roles:
+    - role: common
+    - role: nginx
+    - role: dehydrated
+    - role: redmine
+  tasks: []
+  post_tasks:
+    - name: リストアに利用したファイルを削除
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ redmine_restore_files_archive_file }}"
+        - "{{ redmine_restore_database_dump_file }}"
+
+    
