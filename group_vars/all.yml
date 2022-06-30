@@ -58,7 +58,6 @@ redmine_db_cfg:
     password: "{{ lookup('env', 'REDMINE_DB_PASSWORD') }}"
     encoding: utf8mb4
 
-
 redmine_themes:
   - name: PurpleMine2
     repo: https://github.com/mrliptontea/PurpleMine2.git
@@ -70,10 +69,10 @@ redmine_themes:
 redmine_plugins:
   - name: additionals
     repo: https://github.com/AlphaNodes/additionals.git
-    verson: stable
+    version: stable
   - name: sudo
     repo: https://github.com/AlphaNodes/redmine_sudo.git
-    verson: stable
+    version: stable
   - name: view_customize
     repo: https://github.com/onozaty/redmine-view-customize.git
     directory: view_customize

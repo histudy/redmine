@@ -10,7 +10,6 @@
           dest: "{{ redmine_restore_files_archive_file }}"
         - src: "(オブジェクトストレージのデータベースダンプデータのパスをここに書く)"
           dest: "{{ redmine_restore_database_dump_file }}"
-        
   roles:
     - role: common
     - role: nginx
