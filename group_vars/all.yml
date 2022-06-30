@@ -57,3 +57,38 @@ redmine_db_cfg:
     username: "{{ lookup('env', 'REDMINE_DB_USER') }}"
     password: "{{ lookup('env', 'REDMINE_DB_PASSWORD') }}"
     encoding: utf8mb4
+
+
+redmine_themes:
+  - name: PurpleMine2
+    repo: https://github.com/mrliptontea/PurpleMine2.git
+  - name: farend_fancy
+    repo: https://github.com/farend/redmine_theme_farend_fancy.git
+  - name: farend_basic
+    repo: https://github.com/farend/redmine_theme_farend_basic.git
+
+redmine_plugins:
+  - name: additionals
+    repo: https://github.com/AlphaNodes/additionals.git
+    verson: stable
+  - name: sudo
+    repo: https://github.com/AlphaNodes/redmine_sudo.git
+    verson: stable
+  - name: view_customize
+    repo: https://github.com/onozaty/redmine-view-customize.git
+    directory: view_customize
+  - name: message_customize
+    repo: https://github.com/ishikawa999/redmine_message_customize.git
+  - name: issue_templates
+    repo: https://github.com/agileware-jp/redmine_issue_templates.git
+  - name: slack
+    repo: https://github.com/cat-in-136/redmine-slack.git
+    version: evolved
+  - name: drawio
+    repo: https://github.com/mikitex70/redmine_drawio.git
+  - name: redmica_ui_extension
+    repo: https://github.com/redmica/redmica_ui_extension.git
+    directory: redmica_ui_extension
+  - name: dmsf
+    repo: https://github.com/danmunn/redmine_dmsf.git
+    version: "3.0.2"
