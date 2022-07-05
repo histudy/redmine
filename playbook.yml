@@ -1,14 +1,29 @@
 - name: Deploy Redmine
   hosts: redmine
   pre_tasks:
+    - name: rcloneのインストール
+      ansible.builtin.apt:
+        name: rclone
+    - name: rcloneの設定を生成
+      ansible.builtin.command:
+        cmd: |
+          rclone config create sakura_cloud s3 \
+          provider=Other \
+          access_key_id={{ lookup('env', 'OBJECT_STORAGE_ACCESS_KEY_ID') }} \
+          secret_access_key={{ lookup('env', 'OBJECT_STORAGE_SECRET_ACCESS_KEY') }} \
+          region={{ lookup('env', 'OBJECT_STORAGE_REGION') }} \
+          endpoint=={{ lookup('env', 'OBJECT_STORAGE_ENDPOINT') }} \
+          acl=private \
+          bucket_acl=private
+        creates: ~/.config/rclone/rclone.conf
     - name: オブジェクトストレージからバックアップファイルファイルを取得し所定のパスに保存
       ansible.builtin.command: 
-        cmd: "(取得するコマンドをここに書く)"
+        cmd: rclone copy sakura_cloud:{{ lookup('env', 'OBJECT_STORAGE_BUCKET') }}{{ item.src }} {{ item.dest }}
         creates: "{{ redmine_home }}/config/initializers/secret_token.rb"
       loop:
-        - src: "(オブジェクトストレージのfilesのバックデータのパスをここに書く)"
+        - src: "/redmine/backup/files.tar.gz"
           dest: "{{ redmine_restore_files_archive_file }}"
-        - src: "(オブジェクトストレージのデータベースダンプデータのパスをここに書く)"
+        - src: /redmine/backup/database_dump.sql.gz"
           dest: "{{ redmine_restore_database_dump_file }}"
   roles:
     - role: common
