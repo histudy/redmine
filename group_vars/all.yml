@@ -1,14 +1,17 @@
 common_users:
   - name: sperkbird
     admin: true
+    password: "{{ lookup('csvfile', 'sperkbird', file='users.csv', delimiter=',') | password_hash('sha512') }}"
     authorized_keys:
       - key: https://github.com/sperkbird.keys
   - name: wate
     admin: true
+    password: "{{ lookup('csvfile', 'wate', file='users.csv', delimiter=',') | password_hash('sha512')  }}"
     authorized_keys:
       - key: https://github.com/wate.keys
   - name: nogajun
     admin: true
+    password: "{{ lookup('csvfile', 'nogajun', file='users.csv', delimiter=',') | password_hash('sha512')  }}"
     authorized_keys:
       - key: https://github.com/nogajun.keys
 

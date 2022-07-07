@@ -47,11 +47,11 @@
   #   - role: dehydrated
   #   - role: redmine
   tasks: []
-  post_tasks:
-    - name: リストアに利用したファイルを削除
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - "{{ redmine_restore_files_archive_file }}"
-        - "{{ redmine_restore_database_dump_file }}"
+  # post_tasks:
+  #   - name: リストアに利用したファイルを削除
+  #     ansible.builtin.file:
+  #       path: "{{ item }}"
+  #       state: absent
+  #     loop:
+  #       - "{{ redmine_restore_files_archive_file }}"
+  #       - "{{ redmine_restore_database_dump_file }}"
