@@ -1,5 +1,6 @@
 - name: Deploy Redmine
   hosts: redmine
+  become: true
   pre_tasks:
     - name: rcloneのインストール
       ansible.builtin.apt:
@@ -32,26 +33,13 @@
           value: "{{ lookup('env', 'OBJECT_STORAGE_ENDPOINT') }}"
         - name: acl
           value: private
-    - name: オブジェクトストレージからバックアップファイルファイルを取得し所定のパスに保存
-      ansible.builtin.command: 
-        cmd: rclone copy sakura_cloud:{{ lookup('env', 'OBJECT_STORAGE_BUCKET') }}{{ item.src }} {{ item.dest }}
-        creates: "{{ redmine_home | default('/opt/redmine') }}/config/initializers/secret_token.rb"
-      loop:
-        - src: /redmine/backup/database_dump.sql.gz
-          dest: "{{ redmine_restore_database_dump_file }}"
-        - src: /redmine/backup/files.tar.gz
-          dest: "{{ redmine_restore_files_archive_file }}"
   roles:
     - role: common
-  #   - role: nginx
-  #   - role: dehydrated
-  #   - role: redmine
+      tags: role_common
+    - role: nginx
+      tags: role_nginx
+    - role: dehydrated
+      tags: role_dehydrated
+    - role: redmine
+      tags: role_redmine
   tasks: []
-  # post_tasks:
-  #   - name: リストアに利用したファイルを削除
-  #     ansible.builtin.file:
-  #       path: "{{ item }}"
-  #       state: absent
-  #     loop:
-  #       - "{{ redmine_restore_files_archive_file }}"
-  #       - "{{ redmine_restore_database_dump_file }}"

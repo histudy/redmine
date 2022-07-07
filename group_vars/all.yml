@@ -19,6 +19,11 @@ dehydrated_domains:
   - name: "{{ inventory_hostname }}"
     domains: "{{ inventory_hostname }}"
 
+dehydrated_hook_deploy_cert: |
+  systemctl restart nginx
+dehydrated_hook_deploy_ocsp: |
+  systemctl restart nginx
+
 nginx_vhosts:
   - name: default
     default: true
@@ -48,9 +53,12 @@ nginx_vhosts:
     #   stapling: true
     #   stapling_verify: true
 
-redmine_restore: true
-redmine_restore_files_archive_file: "/tmp/redmine_files_archive.tar.gz"
-redmine_restore_database_dump_file: "/tmp/redmine_database_dump.tar.gz"
+redmine_cfg:
+  default:
+    email_delivery:
+      delivery_method: :sendmail
+    sudo_mode: true
+    sudo_mode_timeout: 15
 
 redmine_db_cfg:
   production:
@@ -72,7 +80,7 @@ redmine_themes:
 redmine_plugins:
   - name: additionals
     repo: https://github.com/AlphaNodes/additionals.git
-    version: stable
+    version: "3.0.5.2"
   - name: sudo
     repo: https://github.com/AlphaNodes/redmine_sudo.git
     version: stable
@@ -93,4 +101,4 @@ redmine_plugins:
     directory: redmica_ui_extension
   - name: dmsf
     repo: https://github.com/danmunn/redmine_dmsf.git
-    version: "3.0.2"
+    version: "v3.0.2"
