@@ -21,10 +21,10 @@
         cmd: rclone copy sakura_cloud:{{ lookup('env', 'OBJECT_STORAGE_BUCKET') }}{{ item.src }} {{ item.dest }}
         creates: "{{ redmine_home }}/config/initializers/secret_token.rb"
       loop:
-        - src: "/redmine/backup/files.tar.gz"
-          dest: "{{ redmine_restore_files_archive_file }}"
-        - src: /redmine/backup/database_dump.sql.gz"
+        - src: /redmine/backup/database_dump.sql.gz
           dest: "{{ redmine_restore_database_dump_file }}"
+        - src: /redmine/backup/files.tar.gz
+          dest: "{{ redmine_restore_files_archive_file }}"
   roles:
     - role: common
     - role: nginx
