@@ -4,40 +4,54 @@
     - name: rcloneのインストール
       ansible.builtin.apt:
         name: rclone
+    - name: rcloneの設定ファイル保存用ディレクトリの作成
+      ansible.builtin.file:
+        path: ~/.config/rclone
+        state: directory
+        mode: "0755"
     - name: rcloneの設定を生成
-      ansible.builtin.command:
-        cmd: |
-          rclone config create sakura_cloud s3 \
-          provider=Other \
-          access_key_id={{ lookup('env', 'OBJECT_STORAGE_ACCESS_KEY_ID') }} \
-          secret_access_key={{ lookup('env', 'OBJECT_STORAGE_SECRET_ACCESS_KEY') }} \
-          region={{ lookup('env', 'OBJECT_STORAGE_REGION') }} \
-          endpoint=={{ lookup('env', 'OBJECT_STORAGE_ENDPOINT') }} \
-          acl=private \
-          bucket_acl=private
-        creates: ~/.config/rclone/rclone.conf
+      community.general.ini_file:
+        path: ~/.config/rclone/rclone.conf
+        section: sakura_cloud
+        option: "{{ item.name }}"
+        value: "{{ item.value }}"
+        mode: "0600"
+        create: true
+      loop:
+        - name: type
+          value: s3
+        - name: provider
+          value: Other
+        - name: access_key_id
+          value: "{{ lookup('env', 'OBJECT_STORAGE_ACCESS_KEY_ID') }}"
+        - name: secret_access_key
+          value: "{{ lookup('env', 'OBJECT_STORAGE_SECRET_ACCESS_KEY') }}"
+        - name: region
+          value: "{{ lookup('env', 'OBJECT_STORAGE_REGION') }}"
+        - name: endpoint
+          value: "{{ lookup('env', 'OBJECT_STORAGE_ENDPOINT') }}"
+        - name: acl
+          value: private
     - name: オブジェクトストレージからバックアップファイルファイルを取得し所定のパスに保存
       ansible.builtin.command: 
         cmd: rclone copy sakura_cloud:{{ lookup('env', 'OBJECT_STORAGE_BUCKET') }}{{ item.src }} {{ item.dest }}
-        creates: "{{ redmine_home }}/config/initializers/secret_token.rb"
+        creates: "{{ redmine_home | default('/opt/redmine') }}/config/initializers/secret_token.rb"
       loop:
         - src: /redmine/backup/database_dump.sql.gz
           dest: "{{ redmine_restore_database_dump_file }}"
         - src: /redmine/backup/files.tar.gz
           dest: "{{ redmine_restore_files_archive_file }}"
-  roles:
-    - role: common
-    - role: nginx
-    - role: dehydrated
-    - role: redmine
-  tasks: []
-  post_tasks:
-    - name: リストアに利用したファイルを削除
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - "{{ redmine_restore_files_archive_file }}"
-        - "{{ redmine_restore_database_dump_file }}"
-
-    
+  # roles:
+  #   - role: common
+  #   - role: nginx
+  #   - role: dehydrated
+  #   - role: redmine
+  # tasks: []
+  # post_tasks:
+  #   - name: リストアに利用したファイルを削除
+  #     ansible.builtin.file:
+  #       path: "{{ item }}"
+  #       state: absent
+  #     loop:
+  #       - "{{ redmine_restore_files_archive_file }}"
+  #       - "{{ redmine_restore_database_dump_file }}"
