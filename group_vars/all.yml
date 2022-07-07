@@ -2,15 +2,15 @@ common_users:
   - name: sperkbird
     admin: true
     authorized_keys:
-      - https://github.com/sperkbird.keys
+      - key: https://github.com/sperkbird.keys
   - name: wate
     admin: true
     authorized_keys:
-      - https://github.com/wate.keys
+      - key: https://github.com/wate.keys
   - name: nogajun
     admin: true
     authorized_keys:
-      - https://github.com/nogajun.keys
+      - key: https://github.com/nogajun.keys
 
 dehydrated_domains:
   - name: "{{ inventory_hostname }}"

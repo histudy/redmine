@@ -41,17 +41,17 @@
           dest: "{{ redmine_restore_database_dump_file }}"
         - src: /redmine/backup/files.tar.gz
           dest: "{{ redmine_restore_files_archive_file }}"
-  # roles:
-  #   - role: common
+  roles:
+    - role: common
   #   - role: nginx
   #   - role: dehydrated
   #   - role: redmine
-  # tasks: []
-  # post_tasks:
-  #   - name: リストアに利用したファイルを削除
-  #     ansible.builtin.file:
-  #       path: "{{ item }}"
-  #       state: absent
-  #     loop:
-  #       - "{{ redmine_restore_files_archive_file }}"
-  #       - "{{ redmine_restore_database_dump_file }}"
+  tasks: []
+  post_tasks:
+    - name: リストアに利用したファイルを削除
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ redmine_restore_files_archive_file }}"
+        - "{{ redmine_restore_database_dump_file }}"
