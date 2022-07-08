@@ -15,6 +15,13 @@ common_users:
     authorized_keys:
       - key: https://github.com/nogajun.keys
 
+common_disks: 
+  - device: /dev/vdb
+    if_device_exists: true
+    partitions:
+      - fstype: ext4
+        number: 1
+
 dehydrated_domains:
   - name: "{{ inventory_hostname }}"
     domains: "{{ inventory_hostname }}"
