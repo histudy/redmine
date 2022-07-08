@@ -1,0 +1,65 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/ansible-playbook.json
+- name: サーバー情報の生成処理
+  hosts: redmine.histudy.jp
+  gather_facts: true
+  become: true
+  vars:
+    filter_sources:
+      - systemd
+    filter_running_states:
+      - running
+    reject_statuses:
+      - static
+      - unknown
+    redmine_url: https://redmine.histudy.jp/
+    redmine_project: kakogawa_infra
+    redmine_wiki_page: Redmine
+    redmine_api_key: "{{ lookup('env', 'REDMINE_API_KEY') }}"
+  tasks:
+    - name: サービスの稼働状況を取得
+      ansible.builtin.service_facts:
+    - name: 稼働中の全サービスを変数に割り当て
+      ansible.builtin.set_fact:
+        all_services: "{{ ansible_facts['services'] | dict2items | list }}"
+    - name: サービスの取得元によるフィルタリング
+      ansible.builtin.set_fact:
+        all_services: "{{ all_services | selectattr('value.source', 'in', filter_values) | list }}"
+      vars:
+        filter_values: "{{ filter_sources }}"
+      when: filter_sources | default([]) | length > 0
+    - name: 稼働中の全サービスを変数に割り当て
+      ansible.builtin.set_fact:
+        all_running_services: "{{ all_services | selectattr('value.state', 'in', filter_values) | list }}"
+      vars:
+        filter_values: "{{ filter_running_states }}"
+    - name: ステータスによるフィルタリング
+      ansible.builtin.set_fact:
+        running_services: "{{ all_running_services | rejectattr('value.status', 'in', filter_values) | list }}"
+      vars:
+        filter_values: "{{ reject_statuses }}"
+    - name: サーバー情報の生成
+      ansible.builtin.template:
+        src: server_info.md.j2
+        dest: "./{{ inventory_hostname }}.md"
+        mode: "0644"
+      delegate_to: localhost
+      become: false
+    - name: update Redmine Wiki page
+      ansible.builtin.uri:
+        url: "{{ redmine_url }}projects/{{ redmine_project }}/wiki/{{ redmine_wiki_page }}.json"
+        validate_certs: false
+        method: PUT
+        body:
+          wiki_page:
+            text: "{{ lookup('template', 'server_info.md.j2') }}"
+            comments: "サーバー情報更新"
+        body_format: json
+        status_code: [200, 204]
+        headers:
+          X-Redmine-API-Key: "{{ redmine_api_key }}"
+      when:
+        - redmine_url is defined
+        - redmine_api_key is defined
+        - redmine_project is defined
+        - redmine_wiki_page is defined
