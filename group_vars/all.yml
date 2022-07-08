@@ -15,12 +15,23 @@ common_users:
     authorized_keys:
       - key: https://github.com/nogajun.keys
 
-common_disks: 
+common_disks:
   - device: /dev/vdb
     if_device_exists: true
     partitions:
       - fstype: ext4
         number: 1
+
+common_mounts:
+  - path: /opt/redmine_files
+    src: /dev/vdb1
+    if_device_exists: true
+    fstype: ext4
+    owner: "{{ redmine_user }}"
+    group: "{{ redmine_user }}"
+    automount: true
+    mount_options:
+      - defaults
 
 dehydrated_domains:
   - name: "{{ inventory_hostname }}"
