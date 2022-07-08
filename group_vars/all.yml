@@ -77,6 +77,7 @@ redmine_cfg:
       delivery_method: :sendmail
     sudo_mode: true
     sudo_mode_timeout: 15
+    attachments_storage_path: /opt/redmine_files
 
 redmine_db_cfg:
   production:
