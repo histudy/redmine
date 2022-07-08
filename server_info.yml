@@ -14,6 +14,7 @@
       - unknown
     redmine_url: https://redmine.histudy.jp/
     redmine_project: kakogawa_infra
+    redmine_wiki_platform_page: さくらのクラウド
     redmine_wiki_page: Redmine
     redmine_api_key: "{{ lookup('env', 'REDMINE_API_KEY') }}"
   tasks:
