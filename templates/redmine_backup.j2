@@ -1,0 +1,77 @@
+#!/bin/sh
+
+# ---------------------------
+# バックアップ対象の設定
+# ---------------------------
+## バックアップ対象のデータベース
+DB_NAME="{{ lookup('env', 'REDMINE_DB_NAME') }}"
+DB_USER="{{ lookup('env', 'REDMINE_DB_USER') }}"
+DB_PASSWORD="{{ lookup('env', 'REDMINE_DB_PASSWORD') }}"
+DB_HOST="{{ lookup('env', 'REDMINE_DB_HOST') }}"
+
+## バックアップ対象のディレクトリ
+TARGET_DIR=/opt/redmine_files
+## バックアップファイルのプレフィックス
+FILE_NAME_PREFIX=redmine
+
+# ---------------------------
+# バックアップ先の設定
+# ---------------------------
+## 何日前までのデータを残すか(※Linuxの場合、「日数 - 1」の値を設定する)
+LIFELIMIT_PAR_DAY=2
+## バックアップ先ディレクトリ
+BACKUP_DIR={{ backup_dir }}
+
+## バックアップ日時の情報
+## (バックアップファイル名として利用)
+BACKUP_DATE=$(date +"%Y-%m-%d")
+BACKUP_TIME=$(date +"%H%M%S")
+BACKUP_DATETIME="${BACKUP_DATE}_${BACKUP_TIME}"
+
+mkdir -p ${BACKUP_DIR}
+
+cd ${BACKUP_DIR} || exit 1;
+
+echo "# ---------------------------"
+echo "# Cleanup old backup files"
+echo "# ---------------------------"
+if [ -n "${DB_NAME}" ]; then
+    find ${DB_NAME}-*.sql.gz -mtime +${LIFELIMIT_PAR_DAY} -exec ls -l {} \;
+    find ${DB_NAME}-*.sql.gz -mtime +${LIFELIMIT_PAR_DAY} -exec rm {} \;
+fi
+if [ -n "${TARGET_DIR}" ]; then
+    find ${FILE_NAME_PREFIX}-*.tar.gz -mtime +${LIFELIMIT_PAR_DAY} -exec ls -l {} \;
+    find ${FILE_NAME_PREFIX}-*.tar.gz -mtime +${LIFELIMIT_PAR_DAY} -exec rm {} \;
+fi
+
+if [ -n "${DB_NAME}" ]; then
+    # データベース名の設定がされている場合は、データベースのバックアップを行う
+    echo "# ---------------------------"
+    echo "# Export Database"
+    echo "# ---------------------------"
+    /usr/bin/mysqldump -u ${DB_USER} -p${DB_PASSWORD} -h ${DB_HOST:-localhost} --single-transaction ${DB_NAME} | gzip >${BACKUP_DIR}/${DB_NAME}-${BACKUP_DATETIME}.sql.gz
+    cd ${BACKUP_DIR} || exit 1;
+    ln -s -f ${DB_NAME}-${BACKUP_DATETIME}.sql.gz ${DB_NAME}-latest.sql.gz
+fi
+
+if [ -n "${TARGET_DIR}" ]; then
+    # バックアップ対象のディレクトリが設定されている場合は、ディレクトリのバックアップを行う
+    echo "# ---------------------------"
+    echo "# Archive target directory"
+    echo "# ---------------------------"
+    cd ${TARGET_DIR} || exit 1;
+    /bin/tar vcfz ${BACKUP_DIR}/${FILE_NAME_PREFIX}-${BACKUP_DATETIME}.tar.gz ./
+    cd ${BACKUP_DIR} || exit 1;
+    ln -s -f ${FILE_NAME_PREFIX}-${BACKUP_DATETIME}.tar.gz ${FILE_NAME_PREFIX}-latest.tar.gz
+fi
+
+rclone sync /backup/data sakura_cloud:{{ lookup('env', 'OBJECT_STORAGE_BUCKET') }}/redmine
+
+cd ${BACKUP_DIR} || exit 1;
+
+echo "# ---------------------------"
+echo "# All Backup files"
+echo "# ---------------------------"
+ls -l
+
+exit 0;

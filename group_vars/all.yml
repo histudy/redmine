@@ -129,3 +129,14 @@ redmine_plugins:
   - name: dmsf
     repo: https://github.com/danmunn/redmine_dmsf.git
     version: "v3.0.2"
+
+## --------
+## バックアップ設定
+## --------
+backup_settings: 
+  - name: redmine backup setting
+    command: "{{ backup_script_dir }}/redmine_backup"
+    template: redmine_backup.j2
+    script_name: redmine_backup
+    hour: 3
+    minute: 30
