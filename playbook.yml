@@ -18,6 +18,8 @@
         value: "{{ item.value }}"
         mode: "0600"
         create: true
+      loop_control:
+        label: "{{ item.name }}"
       loop:
         - name: type
           value: s3
@@ -36,6 +38,8 @@
   roles:
     - role: common
       tags: role_common
+    - role: mackerel_agent
+      tags: role_mackerel_agent
     - role: nginx
       tags: role_nginx
     - role: dehydrated

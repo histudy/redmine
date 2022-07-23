@@ -71,6 +71,14 @@ nginx_vhosts:
       stapling: true
       stapling_verify: true
 
+mackerel_agent_api_key: "{{ lookup('env', 'MACKEREL_API_KEY') }}"
+
+mackerel_agent_extra_setting: |
+  [plugin.metrics.linux]
+  command = "/usr/bin/mackerel-plugin-linux"
+  [plugin.metrics.mailq]
+  command = "/usr/bin/mackerel-plugin-mailq -M postfix"
+
 redmine_cfg:
   default:
     email_delivery:

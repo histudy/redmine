@@ -10,3 +10,6 @@
 - src: https://github.com/wate/ansible-role-redmine.git
   version: master
   name: redmine
+- src: https://github.com/wate/ansible-role-mackerel_agent.git
+  version: master
+  name: mackerel_agent
