@@ -46,4 +46,9 @@
       tags: role_dehydrated
     - role: redmine
       tags: role_redmine
-  tasks: []
+  tasks: 
+    - name: remove mariadb-server
+      ansible.builtin.apt:
+        name: mariadb-server
+        state: absent
+        autoremove: true
