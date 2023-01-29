@@ -1,72 +1,47 @@
-mackerel-agent
-=========
+mackerel_agent
+=================
 
-[![Build Status](https://travis-ci.org/wate/ansible-role-mackerel-agent.svg?branch=master)](https://travis-ci.org/wate/ansible-role-mackerel-agent)
+Setup mackerel agent
 
-mackerel-agentのインストールとセットアップを行います。
+OS Platform
+-----------------
+
+### Debian
+
+- bullseye
+- buster
 
 Role Variables
 --------------
 
-### mackerel_agent_packages
+設定方法の詳細については[defaults/main.yml](defaults/main.yml)のサンプルコードを参照してください。
 
-インストールするパッケージを指定します
+### `mackerel_agent_packages`
 
-```yml
-mackerel_agent_packages:
-  - mackerel-agent
-  - mackerel-agent-plugins
-  - mackerel-check-plugins
-  - mkr
+インストールするパッケージ
 
-```
+### `mackerel_agent_api_key`
 
-### mackerel_agent_api_key
+APIキー
 
-mackerel-agentのAPIキーを指定します。
+### `mackerel_agent_active_and_enabled_on_system_startup`
 
-```yml
-mackerel_agent_api_key: "abcdefg"
-```
+サービスの有効化および自動実行の設定
 
-### mackerel_agent_active_and_enabled_on_system_startup
+### `mackerel_agent_extra_setting`
 
-mackerel-agentを起動させるかどうかを指定します。
-
-この変数に`true`が設定されている場合、
-mackerel-agentを有効に設定し起動させます。
-
-この変数に`false`が設定されている場合、
-mackerel-agentを無効に設定し停止させます。
-
-```yml
-mackerel_agent_active_and_enabled_on_system_startup: true
-```
-
-### mackerel_agent_extra_setting
-
-mackerel-agentのチェックプラグインなどの設定を指定します
-
-```yml
-mackerel_agent_extra_setting: |
-  [plugin.metrics.linux]
-  command = "mackerel-plugin-linux"
-  [plugin.checks.la]
-  command = "check-load -w 3,2,1 -c 3,2,1"
-  action = { command = "bash -c '[ \"$MACKEREL_STATUS\" != \"OK\" ]' && date >> /var/log/ps-auxf.txt && ps auxf >> /var/log/ps-auxf.txt", user = "root" }
-  memo = "LAをチェックし、高騰したときにはそのときの ps auxf の結果を出力します"
-```
+Mackerelエージェントの追加設定(プラグインの設定など)
 
 Example Playbook
-----------------
+--------------
 
-```yml
+```yaml
 - hosts: servers
   roles:
-    - role: mackerel-agent
+    - role: mackerel_agent
 ```
 
 License
--------
+--------------
 
-MIT
+Apache License 2.0

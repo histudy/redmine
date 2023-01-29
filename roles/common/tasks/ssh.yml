@@ -1,33 +1,48 @@
-# ---
-- name: install geoip packages
+---
+- name: Install GeoIP packages
   ansible.builtin.apt:
     name:
       - geoip-bin
       - geoip-database
-- name: create ssh filter script
+- name: Download GeoIP database update script
+  ansible.builtin.get_url:
+    url: https://mailfud.org/geoip-legacy/geoip_update.sh
+    dest: /etc/cron.weekly/geoip_update
+    mode: "0755"
+- name: Update GeoIP database file setting
+  ansible.builtin.lineinfile:
+    path: /etc/cron.weekly/geoip_update
+    regexp: ^FILES=
+    line: FILES="{{ common_geoip_update_files | join(' ') }}"
+  register: update_geoip_database_files_result
+- name: Update GeoIP database
+  ansible.builtin.command:
+    cmd: /etc/cron.weekly/geoip_update
+  when: update_geoip_database_files_result is changed
+- name: Create ssh filter script
   ansible.builtin.template:
     src: ssh/sshfilter.j2
     dest: /usr/local/bin/sshfilter
     mode: "0755"
-- name: set TCP Wrapper(deny)
+- name: Set TCP Wrapper(deny)
   ansible.builtin.lineinfile:
     path: /etc/hosts.deny
     regexp: "^sshd: "
-    line: 'sshd: ALL'
+    line: "sshd: ALL"
     state: "{{ common_ssh_use_geoip_filter | ternary('present', 'absent') }}"
-- name: set TCP Wrapper(allow)
+- name: Set TCP Wrapper(allow)
   ansible.builtin.lineinfile:
     path: /etc/hosts.allow
     regexp: "^sshd: "
-    line: 'sshd: ALL: spawn /usr/local/bin/sshfilter %a'
+    line: "sshd: ALL: spawn /usr/local/bin/sshfilter %a"
     state: "{{ common_ssh_use_geoip_filter | ternary('present', 'absent') }}"
-- name: allow SSH port
-  ufw:
+- name: Ensure allow SSH port
+  community.general.ufw:
     port: "{{ common_ssh_port | string }}"
     proto: tcp
     rule: "{{ common_ssh_ufw_rule }}"
-- name: enable ufw and set default policy
-  ufw:
+- name: Ensure enable ufw and set default policy
+  community.general.ufw:
     logging: "on"
     state: enabled
     direction: incoming

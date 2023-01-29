@@ -4,7 +4,7 @@ common_files:
     src: files/test_script
     mode: "0755"
   - dest: /usr/local/bin/download_file
-    url: "https://dummyimage.com/600x400/000/fff"
+    url: https://dummyimage.com/600x400/000/fff
     mode: "0644"
   - dest: /usr/local/bin/remove_file
     removed: true
@@ -12,6 +12,7 @@ common_files:
 common_users:
   - name: simple
     password: "{{ 'password' | password_hash('sha512') }}"
+  - name: disable_acount
   - name: full_set
     password: "{{ 'password' | password_hash('sha512') }}"
     authorized_keys:
@@ -100,3 +101,9 @@ backup_settings:
     script_name: test_script_2
     hour: 2
     minute: 34
+
+common_geoip_update_files:
+  - GeoIP
+  - GeoIPv6
+  - GeoIPCity
+  - GeoIPCityv6

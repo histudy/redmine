@@ -1,22 +1,23 @@
-- name: custom script setting
+---
+- name: Custom script setting
+  become: true
+  become_user: "{{ redmine_user }}"
   block:
-    - name: create custom script directory
+    - name: Create custom script directory
       ansible.builtin.file:
         path: "{{ redmine_script_dir }}"
         state: directory
         mode: "0750"
-    - name: create custom script
+    - name: Create custom script
       ansible.builtin.template:
         src: "{{ item.file }}"
-        dest: "{{ redmine_script_dir }}/{{ item.remote_name | default( item.file | basename ) }}"
+        dest: "{{ redmine_script_dir }}/{{ item.remote_name | default(item.file | basename) }}"
         owner: "{{ redmine_user }}"
         group: "{{ redmine_user }}"
-        mode: "{{ item.mode | default( '0700' ) }}"
+        mode: "{{ item.mode | default('0700') }}"
       loop: "{{ redmine_custom_script_files | default([]) | selectattr('removed', 'undefined') | list }}"
-    - name: remove custom script
+    - name: Remove custom script
       ansible.builtin.file:
-        path: "{{ redmine_script_dir }}/{{ item.remote_name | default( item.file | basename ) }}"
+        path: "{{ redmine_script_dir }}/{{ item.remote_name | default(item.file | basename) }}"
         state: absent
       loop: "{{ redmine_custom_script_files | default([]) | selectattr('removed', 'defined') | list }}"
-  become_user: "{{ redmine_user }}"
-  become: true
