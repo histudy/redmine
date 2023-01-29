@@ -70,7 +70,7 @@ nginx_vhosts:
       session_timeout: "1d"
       session_cache: "shared:SSL:10m"
       session_tickets: false
-      # hsts: "max-age={{ 60 * 60 * 24 * (365 / 2) }};"
+      hsts: "max-age={{ 60 * 60 * 24 * (365 / 2) }};"
       stapling: true
       stapling_verify: true
 
@@ -81,6 +81,8 @@ mackerel_agent_extra_setting: |
   command = "/usr/bin/mackerel-plugin-linux"
   [plugin.metrics.mailq]
   command = "/usr/bin/mackerel-plugin-mailq -M postfix"
+
+redmine_version: 4.0-stable
 
 redmine_cfg:
   default:
