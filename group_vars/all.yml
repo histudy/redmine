@@ -1,3 +1,6 @@
+---
+admin_group_name: server_admin
+
 common_users:
   - name: sperkbird
     admin: true
@@ -140,3 +143,5 @@ backup_settings:
     script_name: redmine_backup
     hour: 3
     minute: 30
+
+install_other_japanese_fonts: false
